@@ -1,5 +1,184 @@
 # Network-Traffic-Analysis-API
 
+### 1. **Project Description**
+
+A FastAPI application that allows uploading network traffic dumps (e.g., PCAP files), analyzes them, and provides information about:
+
+- Suspicious IP addresses.
+- Protocols in use.
+- Potential threats.
+
+---
+
+### 2. **Main Features**
+
+1. **File Upload**:
+   - Endpoint for uploading PCAP files.
+   - File size limit and format validation.
+2. **Traffic Analysis**:
+   - Uses the Scapy library for packet analysis.
+   - Visualizes data on protocol types and packet counts.
+3. **Reports**:
+   - Endpoint to retrieve a JSON report with analysis results.
+   - Information on suspicious IPs, unusual packets, and recommendations.
+4. **Real-Time Analysis (Optional)**:
+   - Enables live logging for real-time packet monitoring (via WebSocket).
+
+---
+
+### 3. **Technology Stack**
+
+- **FastAPI**: API implementation.
+- **Scapy**: Network traffic analysis.
+- **SQLAlchemy**: Stores upload and analysis history in the database.
+- **Redis (optional)**: Caching requests and temporary data.
+- **Uvicorn**: Runs the application.
+- **Plotly/Dash**: Visualization (can embed graphs in the frontend).
+
+---
+
+### 4. **Project Structure**
+
+#### **4.1. Overall Project Structure**
+```plaintext
+project/
+├── app/                      # Core application logic
+│   ├── main.py               # Application entry point
+│   ├── routers/              # API routes
+│   │   ├── __init__.py
+│   │   ├── upload.py         # File upload endpoint
+│   │   ├── analysis.py       # File analysis endpoint
+│   │   ├── reports.py        # Report generation endpoint
+│   ├── services/             # Business logic
+│   │   ├── __init__.py
+│   │   ├── file_service.py   # File operations (saving, validation)
+│   │   ├── analysis_service.py # Packet analysis
+│   │   ├── report_service.py # Report generation
+│   ├── models.py             # Database models
+│   ├── schemas.py            # Pydantic schemas for requests and responses
+│   ├── config.py             # Application configuration
+│   ├── utils.py              # Utilities (common functions)
+├── tests/                    # Application tests
+│   ├── __init__.py
+│   ├── test_upload.py        # File upload tests
+│   ├── test_analysis.py      # Traffic analysis tests
+│   ├── test_reports.py       # Report tests
+├── data/                     # Test data (e.g., sample PCAP files)
+│   ├── sample.pcap
+├── requirements.txt          # Dependency list
+├── README.md                 # Project documentation
+├── Dockerfile                # Docker configuration
+├── .env                      # Environment variables
+```
+
+---
+
+#### **4.2. Main Modules**
+1. **`main.py`**  
+   - Entry point for the application.  
+   - Configures the FastAPI app, routes, database, and middlewares.  
+
+2. **Routers (`routers/`)**  
+   - Each functional block has its own router.  
+   - **`upload.py`**: Handles file uploads (POST /upload).  
+   - **`analysis.py`**: Runs file analysis (GET /analysis/{file_id}).  
+   - **`reports.py`**: Generates reports (GET /reports/{file_id}).  
+
+3. **Services (`services/`)**  
+   - Implements business logic:  
+     - **`file_service.py`**: Validates uploaded files, saves, and deletes them.  
+     - **`analysis_service.py`**: Analyzes traffic using Scapy.  
+     - **`report_service.py`**: Generates JSON reports and graphs.  
+
+4. **Models (`models.py`)**  
+   - SQLAlchemy models for the database:  
+     - Stores information about uploaded files.  
+     - Tracks requests and analysis history.  
+
+5. **Schemas (`schemas.py`)**  
+   - Defines input and output data using Pydantic:  
+     - Requests (e.g., file upload).  
+     - Responses (e.g., analysis results).  
+
+6. **Configuration (`config.py`)**  
+   - Stores all application settings:  
+     - File storage paths.  
+     - Database settings.  
+     - Secret keys (loaded from `.env`).  
+
+---
+
+#### **4.3. Technology Stack**
+- **FastAPI**: Core application.  
+- **SQLAlchemy/SQLite**: Data storage for files and reports.  
+- **Scapy**: Network traffic analysis.  
+- **Plotly**: Data visualization.  
+- **Redis (optional)**: Request and temporary data caching.  
+- **Pytest**: For writing tests.  
+
+---
+
+#### **4.4. Module Interaction Example**
+1. A user uploads a PCAP file through the `/upload` endpoint.
+   - The file is validated in `file_service.py` and saved to disk.  
+   - A record of the file is stored in the database.  
+
+2. The user requests file analysis through `/analysis/{file_id}`.  
+   - The file is retrieved from storage.  
+   - `analysis_service.py` uses Scapy to parse the packets.  
+   - Analysis results are saved in the database.  
+
+3. The user requests a report through `/reports/{file_id}`.  
+   - `report_service.py` generates a JSON response with the data.  
+   - Visualization (if needed) is added using Plotly.  
+
+---
+
+### 5. **Development Stages**
+
+1. **Set Up FastAPI Project**:
+   - Create the base server.
+   - Add routing and structure.
+2. **Implement File Upload**:
+   - Develop an endpoint for file uploads.
+   - Store files temporarily or in the database.
+3. **Analyze Network Traffic**:
+   - Use Scapy to parse PCAP files.
+   - Extract information on IPs, protocols, and anomalies.
+4. **Generate Reports**:
+   - Create a JSON schema for returning results.
+   - Add data visualization (e.g., protocol distribution charts).
+5. **Testing and Optimization**:
+   - Write API tests.
+   - Optimize large file processing.
+
+---
+
+### 6. **API Examples**
+
+- **POST /upload**: Upload a PCAP file.
+- **GET /report/{file_id}**: Retrieve a JSON report.
+- **GET /stats**: Retrieve general statistics.
+
+---
+
+### **Key Objectives of Network Traffic Analysis**
+
+1. **Monitor Network Performance**:
+   - Examine the types of transmitted data (HTTP, DNS, FTP, etc.).
+   - Assess traffic volumes and data transfer speeds.
+2. **Detect Security Threats**:
+   - Identify suspicious IP addresses that may be sources of attacks.
+   - Analyze anomalous patterns, such as DDoS attacks, port scans, or malware injections.
+3. **Troubleshoot Network Issues**:
+   - Locate configuration errors.
+   - Identify devices causing load or failures.
+4. **Gather Information for Investigations**:
+   - Log traffic for incident investigations.
+   - Analyze event chronology during network attacks.
+
+# Network-Traffic-Analysis-API RUS version
+
 ### 1. **Описание проекта**
 
 FastAPI-приложение, которое позволяет загружать дампы сетевого трафика (например, PCAP-файлы), анализирует их и возвращает информацию о:
