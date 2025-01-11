@@ -38,5 +38,11 @@ def analyze_uploaded_file(file_name: str):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return analysis_result
+    return {
+        "total_packets": analysis_result["total_packets"],
+        "protocols": analysis_result["protocols"],
+        "ip_addresses": analysis_result["ip_addresses"],
+        "http_requests": analysis_result["http_requests"],
+        "dns_queries": analysis_result["dns_queries"],
+    }
 
