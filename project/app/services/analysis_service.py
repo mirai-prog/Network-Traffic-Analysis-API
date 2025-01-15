@@ -7,6 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def analyze_pcap(file_path: str) -> Dict[str, Any]:
     """
     Анализирует PCAP-файл, извлекая информацию о протоколах, IP-адресах, HTTP-запросах и DNS-запросах.
@@ -40,17 +41,31 @@ def analyze_pcap(file_path: str) -> Dict[str, Any]:
             ip_addresses[packet.dst] += 1
 
         if packet.haslayer(HTTPRequest):
-            method = packet[HTTPRequest].Method.decode() if packet[HTTPRequest].Method else "UNKNOWN"
-            host = packet[HTTPRequest].Host.decode() if packet[HTTPRequest].Host else "UNKNOWN"
-            path = packet[HTTPRequest].Path.decode() if packet[HTTPRequest].Path else "/"
-            http_requests.append({
-                "method": method,
-                "host": host,
-                "path": path,
-            })
+            method = (
+                packet[HTTPRequest].Method.decode()
+                if packet[HTTPRequest].Method
+                else "UNKNOWN"
+            )
+            host = (
+                packet[HTTPRequest].Host.decode()
+                if packet[HTTPRequest].Host
+                else "UNKNOWN"
+            )
+            path = (
+                packet[HTTPRequest].Path.decode() if packet[HTTPRequest].Path else "/"
+            )
+            http_requests.append(
+                {
+                    "method": method,
+                    "host": host,
+                    "path": path,
+                }
+            )
 
         if packet.haslayer(DNS) and packet[DNS].qd:
-            query_name = packet[DNS].qd.qname.decode() if packet[DNS].qd.qname else "UNKNOWN"
+            query_name = (
+                packet[DNS].qd.qname.decode() if packet[DNS].qd.qname else "UNKNOWN"
+            )
             dns_queries.append(query_name)
 
     result = {
@@ -63,4 +78,3 @@ def analyze_pcap(file_path: str) -> Dict[str, Any]:
 
     logger.info(f"Анализ завершен. Результат: {result}")
     return result
-
