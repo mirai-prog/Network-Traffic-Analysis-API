@@ -3,7 +3,7 @@ from collections import Counter
 from typing import Dict, Any
 import logging
 
-# Настройка логгирования
+# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

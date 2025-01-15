@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from routers import upload
 
@@ -12,3 +13,8 @@ def healthcheck():
     """
     return {"status": "ok"}
 
+def main():
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    main()
