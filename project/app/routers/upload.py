@@ -1,27 +1,22 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from pathlib import Path
-from app.services.analysis_service import analyze_pcap
+from project.app.services.analysis_service import analyze_pcap
+
 
 router = APIRouter()
 
 UPLOAD_DIR = Path("data")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-
 @router.post("/upload", summary="Загрузка PCAP-файлов")
 async def upload_file(file: UploadFile = File(...)):
     if not file.filename.endswith(".pcap"):
-        raise HTTPException(
-            status_code=400, detail="Допустимы только файлы с расширением .pcap"
-        )
+        raise HTTPException(status_code=400, detail="Допустимы только файлы с расширением .pcap")
 
-    MAX_FILE_SIZE_MB = 10
+    max_file_size_mb = 10
     content = await file.read()
-    if len(content) > MAX_FILE_SIZE_MB * 1024 * 1024:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Файл слишком большой (максимум {MAX_FILE_SIZE_MB} МБ).",
-        )
+    if len(content) > max_file_size_mb * 1024 * 1024:
+        raise HTTPException(status_code=400, detail=f"Файл слишком большой (максимум {max_file_size_mb} МБ).")
 
     file_path = UPLOAD_DIR / file.filename
     with file_path.open("wb") as f:
@@ -32,7 +27,6 @@ async def upload_file(file: UploadFile = File(...)):
         "size": len(content),
         "path": str(file_path),
     }
-
 
 @router.post("/analyze", summary="Анализ PCAP-файла")
 def analyze_uploaded_file(file_name: str):
@@ -45,4 +39,10 @@ def analyze_uploaded_file(file_name: str):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return analysis_result
+    return {
+        "total_packets": analysis_result["total_packets"],
+        "protocols": analysis_result["protocols"],
+        "ip_addresses": analysis_result["ip_addresses"],
+        "http_requests": analysis_result["http_requests"],
+        "dns_queries": analysis_result["dns_queries"],
+    }
